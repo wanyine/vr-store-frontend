@@ -1,0 +1,15 @@
+{
+  "name": "vr-game-store",
+  "productName": "vStore",
+  "description": "Distribution platform for offline vr-games",
+  "version": "0.0.0",
+  "author": {
+    "name": "Jack Li",
+    "email": "ligen@keenvision.cn",
+    "url": "https://coding.net/u/keen-ligen"
+  },
+  "copyright": "© 2016, KeenVison inc.",
+  "homepage": "http://keenvison.cn",
+  "license": "MIT",
+  "main": "out/main.js"
+}
