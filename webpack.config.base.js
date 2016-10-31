@@ -3,9 +3,9 @@ import path from 'path';
 export default {
   module: {
     loaders: [{
-      test: /\.jsx?$/,
-      loaders: ['babel-loader'],
-      exclude: /node_modules/
+      test: /\.js[x]?$/,
+      loaders: ['babel-loader']
+      // exclude: /node_modules/
     }, {
       test: /\.json$/,
       loader: 'json-loader'

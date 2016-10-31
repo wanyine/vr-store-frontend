@@ -1,8 +1,11 @@
 import { spawn } from "child_process"
 import path from "path"
 import os from "os"
+import fs from "fs"
 
-import { app, autoUpdater, BrowserWindow, Menu, shell } from 'electron';
+import config from 'electron-json-config'
+
+import { app, autoUpdater, BrowserWindow, Menu, shell, dialog } from 'electron';
 
 let menu;
 let template;
@@ -267,67 +270,42 @@ if(!handleStartupEvent()){
       Menu.setApplicationMenu(menu);
     } else {
       template = [{
-        label: '&File',
+        label: '&设置',
         submenu: [{
-          label: '&Open',
-          accelerator: 'Ctrl+O'
-        }, {
-          label: '&Close',
-          accelerator: 'Ctrl+W',
+          label: '&游戏目录',
+          accelerator: 'Ctrl+O',
           click() {
-            mainWindow.close();
+            dialog.showOpenDialog({title:'请选择VR资源所在的目录', properties:['openDirectory']}, function callback(files){
+              if(files){
+                const root = files[0]
+                const gameDirs =  fs.readdirSync(root).filter(
+                  dir => fs.existsSync(path.join(root, dir,'exe', `${dir}.exe`))
+                )
+
+                if(gameDirs.length > 0){
+                  config.set('extPath', root)
+                  dialog.showMessageBox({type: 'info', message:"设置成功", buttons:['OK']},  function(){
+                    mainWindow.reload()
+                  })
+                } else {
+                  dialog.showErrorBox("设置失败", "在该目录下没有检测到VR资源")
+                }
+              }
+            })
           }
         }]
       }, {
-        label: '&View',
-        submenu: (process.env.NODE_ENV === 'development') ? [{
-          label: '&Reload',
-          accelerator: 'Ctrl+R',
+        label: '&查看',
+        submenu: [{
+          label: '&游戏目录',
           click() {
-            mainWindow.webContents.reload();
-          }
-        }, {
-          label: 'Toggle &Full Screen',
-          accelerator: 'F11',
-          click() {
-            mainWindow.setFullScreen(!mainWindow.isFullScreen());
-          }
-        }, {
-          label: 'Toggle &Developer Tools',
-          accelerator: 'Alt+Ctrl+I',
-          click() {
-            mainWindow.toggleDevTools();
-          }
-        }] : [{
-          label: 'Toggle &Full Screen',
-          accelerator: 'F11',
-          click() {
-            mainWindow.setFullScreen(!mainWindow.isFullScreen());
+            dialog.showMessageBox({
+              type: 'info', 
+              message: config.has('extPath') ? config.get('extPath') : '尚未设置',
+              buttons:['OK']
+            })
           }
         }]
-      // }, {
-      //   label: 'Help',
-      //   submenu: [{
-      //     label: 'Learn More',
-      //     click() {
-      //       shell.openExternal('http://electron.atom.io');
-      //     }
-      //   }, {
-      //     label: 'Documentation',
-      //     click() {
-      //       shell.openExternal('https://github.com/atom/electron/tree/master/docs#readme');
-      //     }
-      //   }, {
-      //     label: 'Community Discussions',
-      //     click() {
-      //       shell.openExternal('https://discuss.atom.io/c/electron');
-      //     }
-      //   }, {
-      //     label: 'Search Issues',
-      //     click() {
-      //       shell.openExternal('https://github.com/atom/electron/issues');
-      //     }
-      //   }]
       }];
       menu = Menu.buildFromTemplate(template);
       mainWindow.setMenu(menu);

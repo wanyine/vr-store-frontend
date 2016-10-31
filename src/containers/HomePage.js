@@ -7,6 +7,7 @@ import child_process from 'child_process'
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import config from 'electron-json-config'
 import {actions as videoActions} from '../reducers/video'
 import {actions as snackBarActions} from '../reducers/snackBar'
 import Header from '../components/Header'
@@ -32,23 +33,25 @@ class Home extends Component {
 
   componentDidMount(){
   
-    const gamesDir = path.join(process.cwd(), 'games')
-    fs.exists(gamesDir, yes => {
-    
-      if(yes){
-        const games = fs.readdirSync(gamesDir)
-        this.props.setVideos( 
-          games.map(
-            game => ({
-              name: game, 
-              cover: path.join( gamesDir,  game, 'cover.jpg'), 
-              state:"idle" 
-            })
-          )
+    if(config.has('extPath')){
+        let gamesDir = config.get('extPath')
+        const games = fs.readdirSync(gamesDir).filter(
+          dir => fs.existsSync(path.join(gamesDir, dir,'exe', `${dir}.exe`))
         )
-      }
-
-    })
+        if(games.length){
+          this.props.setVideos(games.map(
+              game => ({
+                name: game, 
+                cover: path.join( gamesDir,  game, 'cover.jpg'), 
+                state:"idle" 
+              })
+            )
+          )
+          return
+        }
+    }
+     
+    this.props.openSnackBar('未检测到游戏资源，请正确设置游戏目录')
   }
 
   render(){
