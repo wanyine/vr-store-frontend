@@ -23,7 +23,7 @@ class RecordDetailTable extends Component {
       {
         records.map(record => (
         
-          <TableRow key={record.date}>
+          <TableRow key={record.created}>
             <TableRowColumn> {(new Date(record.created)).toLocaleTimeString()} </TableRowColumn>
             <TableRowColumn> {record.videoName} </TableRowColumn>
             <TableRowColumn> {record.time} </TableRowColumn>

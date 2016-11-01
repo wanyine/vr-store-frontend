@@ -6,17 +6,18 @@ const SELECT_PERIOD ="SELECT_PERIOD"
 
 const handlers = {
   [SET_RECORD_GROUPS](state, recordGroups){
-    return Object.assign(state, {recordGroups})
+    return Object.assign({}, state, {recordGroups})
   },
 
   [SET_DAILY_RECORDS](state, dailyRecords){
-    return Object.assign(state, {dailyRecords})
+    return Object.assign({}, state, {dailyRecords})
+    
   },
   [SELECT_DATE](state, date){
-    return Object.assign(state, {date})
+    return Object.assign({}, state, {date})
   },
   [SELECT_PERIOD](state, period){
-    return Object.assign(state, {period})
+    return Object.assign({}, state, {period})
   }
 }
 

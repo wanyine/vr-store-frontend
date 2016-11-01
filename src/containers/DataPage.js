@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import LoginForm from '../components/LoginForm'
 import RoDialog from '../components/RoDialog'
 import RecordSummaryTable from '../components/RecordSummaryTable'
@@ -21,6 +21,8 @@ import client from '../http/client'
 
 const DataPage = props => {
 
+  const {recordState, dialogState, ...actions} = props
+
   const loadRecords = ({date, period=1, grouped=false}) => {
 
     let params = {beginDay:date, days:period}
@@ -31,39 +33,37 @@ const DataPage = props => {
     client.get('/records', {params})
       .then(res => {
         if(grouped){
-          props.setRecordGroups(res.data)
+          actions.setRecordGroups(res.data)
         } else{
-          props.setDailyRecords({date, records:res.data})
-          props.showDialog(true)
+          actions.setDailyRecords({date, records:res.data})
+          actions.showDialog(true)
         }
       })
-      .catch(err => props.openSnackBar(err.message))
+      .catch(err => actions.openSnackBar(err.message))
   }
 
   return (
     <Layout>
     <RecordSummaryTable 
-      records={props.recordGroups} 
+    
+      recordState={recordState}
       onWatch={ date => loadRecords({date})} 
-      onQuery={() => loadRecords({grouped:true, ...props})}
-      select_date={props.select_date}
-      select_period={props.select_period}
-      period ={props.period}
+      onQuery={ () => loadRecords({grouped:true, period:recordState.period, date:recordState.date})}
+      select_date={actions.select_date}
+      select_period={actions.select_period}
       />
       <RoDialog
-        title = {props.dailyRecords.date}
-        open={props.showed}
-        onConfirm={() => props.showDialog(false)}
+        title = {recordState.dailyRecords.date}
+        open={dialogState}
+        onConfirm={event => actions.showDialog(false)}
       >
-        <RecordDetailTable records={props.dailyRecords.records}/>
+        <RecordDetailTable records={recordState.dailyRecords.records}/>
       </RoDialog>
     </Layout>
   )
 }
 
 export default connect(
-  ({record:{recordGroups, dailyRecords, date, period}, dialog}) => {
-    return {recordGroups, dailyRecords, date, period, showed:dialog}
-  },
+  state =>({recordState:state.record, dialogState:state.dialog}),
   dispatch => bindActionCreators(Object.assign(snackBarActions, dialogActions, recordActions), dispatch)
 )(DataPage);

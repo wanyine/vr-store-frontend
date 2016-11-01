@@ -26,40 +26,40 @@ import Divider from 'material-ui/Divider';
 import client from '../http/client'
 
 class Home extends Component {
-  static propTypes = {
-    openSnackBar : PropTypes.func.isRequired,
-    videos: PropTypes.array.isRequired,
-  };
 
   componentDidMount(){
-  
+
+
+    const {setVideos, openSnackBar} = this.props
+
     if(config.has('extPath')){
-        let gamesDir = config.get('extPath')
-        const games = fs.readdirSync(gamesDir).filter(
-          dir => fs.existsSync(path.join(gamesDir, dir,'exe', `${dir}.exe`))
-        )
-        if(games.length){
-          this.props.setVideos(games.map(
-              game => ({
-                name: game, 
-                cover: path.join( gamesDir,  game, 'cover.jpg'), 
-                state:"idle" 
-              })
-            )
+      const gamesDir = config.get('extPath')
+      const games = fs.readdirSync(gamesDir).filter(
+        dir => fs.existsSync(path.join(gamesDir, dir,'exe', `${dir}.exe`))
+      )
+      if(games.length){
+        setVideos(games.map(
+            game => ({
+              name: game, 
+              cover: path.join( gamesDir,  game, 'cover.jpg'), 
+              state:"idle" 
+            })
           )
-          return
-        }
+        )
+      } else {
+        openSnackBar('未检测到游戏资源，请重新设置游戏目录')
+      }
+    } else {
+      openSnackBar('尚未设置游戏目录')
     }
-     
-    this.props.openSnackBar('未检测到游戏资源，请正确设置游戏目录')
   }
 
   render(){
 
     const {videos, loading, openSnackBar } = this.props;
 
-    const fireGame = (name, index) => {
 
+    const fireGame = (name, index) => {
       new Promise((resolve, reject) =>{
         getmac.getMac((err, mac) => {
           if(err){
@@ -74,7 +74,7 @@ class Home extends Component {
       })
       .then(res => {
         return new Promise((resolve, reject) => {
-          let token_file = path.join('games', name, 'token.txt');
+          let token_file = path.join(config.get('extPath'), name, 'token.txt');
           fs.writeFile(token_file, res.data.token, function(err){
             if(err){
               reject(err)
@@ -85,7 +85,7 @@ class Home extends Component {
         })
       })
       .then(id => {
-        let exe_file = path.join('games', name, 'exe', name + '.exe');
+        let exe_file = path.join(config.get('extPath'), name, 'exe', name + '.exe');
         return new Promise((resolve, reject) => {
           fs.exists(exe_file, function(exist){
             if(exist){
@@ -126,7 +126,7 @@ class Home extends Component {
                         subtitle="不止于VR"
                     />
                     <CardMedia
-                      overlay={<CardTitle subtitle={v.name} /> }
+                      overlay={<CardTitle title={v.name} /> }
                     >
                       <img src={v.cover} width="600px" height="300px"/>
                     </CardMedia>
