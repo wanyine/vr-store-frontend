@@ -9,6 +9,7 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
+
 const RecordSummaryTable = props => (
       <Table selectable={false}>
       <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
@@ -37,7 +38,7 @@ const RecordSummaryTable = props => (
       {
         props.recordState.recordGroups.map(record => (
           <TableRow key={record.date}>
-            <TableRowColumn> {record.date} </TableRowColumn>
+            <TableRowColumn> {record.date.slice(0, 10)} </TableRowColumn>
             <TableRowColumn> {record.time} </TableRowColumn>
             <TableRowColumn> {record.times} </TableRowColumn>
             <TableRowColumn> 

@@ -9,12 +9,14 @@
     "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
     "build": "npm run build-main && npm run build-renderer",
     "start": "cross-env NODE_ENV=production electron ./app",
-    "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./main.development.js",
+    "start-hot": "cross-env HOT=1 NODE_ENV=development BASE_URL='http://keen:8000' electron -r babel-register -r babel-polyfill ./main.development.js",
+    "start-hot-real": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./main.development.js",
     "package": "node -r babel-register package.js",
     "package-all": "npm run package -- --all",
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
     "release": "build --win --x64 --publish never",
-    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\""
+    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
+    "dev-real": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot-real\""
   },
   "build": {
     "appId": "cn.keenvision.vStore",
