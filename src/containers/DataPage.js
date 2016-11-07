@@ -35,7 +35,7 @@ const DataPage = props => {
         if(grouped){
           actions.setRecordGroups(res.data)
         } else{
-          actions.setDailyRecords({date:date.slice(0, 10), records:res.data})
+          actions.setDailyRecords({date:(new Date(date)).toLocaleDateString(), records:res.data})
           actions.showDialog(true)
         }
       })

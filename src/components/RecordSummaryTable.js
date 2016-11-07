@@ -38,7 +38,7 @@ const RecordSummaryTable = props => (
       {
         props.recordState.recordGroups.map(record => (
           <TableRow key={record.date}>
-            <TableRowColumn> {record.date.slice(0, 10)} </TableRowColumn>
+            <TableRowColumn> {(new Date(record.date)).toLocaleDateString()} </TableRowColumn>
             <TableRowColumn> {record.time} </TableRowColumn>
             <TableRowColumn> {record.times} </TableRowColumn>
             <TableRowColumn> 
