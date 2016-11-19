@@ -5,7 +5,7 @@ import fs from "fs"
 
 import config from 'electron-json-config'
 
-import { app, autoUpdater, BrowserWindow, Menu, shell, dialog } from 'electron';
+import { app, autoUpdater, BrowserWindow, Menu, shell, dialog, nativeImage } from 'electron';
 
 let menu;
 let template;
@@ -73,23 +73,6 @@ if(!handleStartupEvent()){
 
   const version = app.getVersion()
 
-  autoUpdater.addListener("update-available", (event) => {
-    console.log("A new update is available")
-      })
-  autoUpdater.addListener("update-downloaded", (event, releaseNotes, releaseName, releaseDate, updateURL) => {
-    console.log("A new update is ready to install", `Version ${releaseName} is downloaded and will be automatically installed on Quit`)
-      })
-  autoUpdater.addListener("error", (error) => {
-    console.log(error)
-      })
-  autoUpdater.addListener("checking-for-update", (event) => {
-    console.log("checking-for-update")
-      })
-  autoUpdater.addListener("update-not-available", () => {
-    console.log("update-not-available")
-      })
-
-  autoUpdater.setFeedURL(`https://${UPDATE_SERVER_HOST}/update/${os.platform()}_${os.arch()}/${version}`)
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
@@ -104,6 +87,27 @@ if(!handleStartupEvent()){
       width: 1024,
       height: 728
     });
+
+    autoUpdater.addListener("update-available", (event) => {
+      mainWindow.setProgressBar(1.1)
+      mainWindow.setOverlayIcon(nativeImage.createFromPath(path.join(__dirname, '..', 'download.png')), 'Upgrading, do not close')
+    })
+    autoUpdater.addListener("update-downloaded", (event, releaseNotes, releaseName, releaseDate, updateURL) => {
+      mainWindow.setProgressBar(-1)
+      mainWindow.setOverlayIcon(null, 'upgraded')
+    })
+    autoUpdater.addListener("error", (error) => {
+      mainWindow.setProgressBar(1, {mode:'error'})
+      mainWindow.setOverlayIcon(null, 'error happend')
+    })
+    autoUpdater.addListener("checking-for-update", (event) => {
+      console.log('checking-for-update')
+    })
+    autoUpdater.addListener("update-not-available", () => {
+      console.log('update-not-available')
+    })
+
+    autoUpdater.setFeedURL(`https://${UPDATE_SERVER_HOST}/update/${os.platform()}_${os.arch()}/${version}`)
 
     let appPath = process.env.NODE_ENV==='development' ?
       path.join( __dirname, 'app', 'app.html') : path.resolve(__dirname, '..', 'app.html') 

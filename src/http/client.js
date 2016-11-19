@@ -13,11 +13,11 @@ clientWithToken.interceptors.response.use(response => {
   return response
 }, err => {
   if(err.response){
-    if(err.response.status == 401){
-      err.message = 'session expired, please logout'
-    } else if(err.response.status == 400){
-      err.message = 'login failed, please check name and password'
-    }
+      err.message = err.response.data
+    // if(err.response.status == 401){
+    // } else if(err.response.status == 400){
+    //   err.message = 'login failed, please check name and password'
+    // }
   }
   return Promise.reject(err)
 })
